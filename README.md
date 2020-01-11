@@ -5,11 +5,9 @@
 [![Documentation Status](https://readthedocs.org/projects/jupyter-notebook/badge/?version=latest)](https://jupyter-notebook.readthedocs.io/en/latest/?badge=latest)
                 
 
-
 The Jupyter notebook is a web-based notebook environment for interactive
 computing.
 
-![Jupyter notebook example](docs/resources/running_code_med.png "Jupyter notebook example")
 
 ### Jupyter notebook, the language-agnostic evolution of IPython notebook
 Jupyter notebook is a language-agnostic HTML notebook application for
