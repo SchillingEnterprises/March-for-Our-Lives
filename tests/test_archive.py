@@ -1,0 +1,89 @@
+"""Dependency-free checks for the static research archive front page."""
+
+from html.parser import HTMLParser
+from pathlib import Path
+import unittest
+from urllib.parse import unquote, urlparse
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+class ArchiveParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.resources = []
+        self.images_without_alt = []
+        self.landmarks = set()
+        self.language = False
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == "html":
+            self.language = bool(attrs.get("lang"))
+        if tag in {"header", "main", "footer", "nav"}:
+            self.landmarks.add(tag)
+        for name in ("href", "src"):
+            value = attrs.get(name, "")
+            parsed = urlparse(value)
+            if value and not parsed.scheme and not value.startswith(("#", "mailto:", "data:")):
+                self.resources.append(unquote(parsed.path))
+        if tag == "img" and not attrs.get("alt", "").strip():
+            self.images_without_alt.append(attrs.get("src", "(missing src)"))
+
+
+class ResearchArchiveTests(unittest.TestCase):
+    def setUp(self):
+        self.source = (ROOT / "index.html").read_text(encoding="utf-8")
+        self.parser = ArchiveParser()
+        self.parser.feed(self.source)
+
+    def test_homepage_is_accessible_and_semantic(self):
+        self.assertTrue(self.parser.language)
+        for landmark in ("header", "main", "footer", "nav"):
+            with self.subTest(landmark=landmark):
+                self.assertIn(landmark, self.parser.landmarks)
+        self.assertIn('href="#main"', self.source)
+
+    def test_all_local_assets_resolve(self):
+        missing = []
+        for path in self.parser.resources:
+            target = (ROOT / path).resolve()
+            if not target.exists():
+                missing.append(path)
+        self.assertEqual(missing, [])
+
+    def test_images_have_alt_text(self):
+        self.assertEqual(self.parser.images_without_alt, [])
+
+    def test_original_data_and_document_assets_are_preserved(self):
+        required = (
+            "src/db/Congress.db",
+            "src/db/temp/mass_shootings.db",
+            "src/db/store/MSA/Stanford_MSA_Data_Dictionary (V.5).pdf",
+            "src/db/store/Abbreviations.sql",
+            "src/images/.png/Grades.png",
+            "LICENSE",
+        )
+        for path in required:
+            with self.subTest(path=path):
+                self.assertTrue((ROOT / path).is_file())
+
+    def test_sidecar_excel_file_is_not_advertised_as_a_workbook(self):
+        sidecar = ROOT / "src/db/store/__MACOSX/MSA/._Stanford_MSA_Database_for_release_06142016.xlsx"
+        self.assertEqual(sidecar.stat().st_size, 181)
+        self.assertNotIn("Download Excel", self.source)
+        self.assertIn("metadata sidecar", self.source)
+
+    def test_research_limitations_are_explicit(self):
+        for phrase in ("not a live data service", "not been independently validated", "provenance"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, self.source)
+
+    def test_old_notebook_runtime_is_not_loaded(self):
+        self.assertNotIn("require.min.js", self.source)
+        self.assertNotIn("CodeMirror", self.source)
+        self.assertNotIn("jupyter", self.source.lower())
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
