@@ -37,6 +37,15 @@ class ResearchArchiveTests(unittest.TestCase):
         self.parser = ArchiveParser()
         self.parser.feed(self.source)
 
+    def test_branded_404_and_robots_are_present(self):
+        self.assertTrue((ROOT / "404.html").is_file())
+        self.assertTrue((ROOT / "robots.txt").is_file())
+        page = (ROOT / "404.html").read_text(encoding="utf-8")
+        self.assertIn('<html lang="en">', page)
+        self.assertIn('<main id="main">', page)
+        self.assertIn("./index.html#research", page)
+        self.assertIn("Original data and source materials remain unchanged", page)
+
     def test_homepage_is_accessible_and_semantic(self):
         self.assertTrue(self.parser.language)
         for landmark in ("header", "main", "footer", "nav"):
