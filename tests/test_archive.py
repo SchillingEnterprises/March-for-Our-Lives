@@ -70,10 +70,10 @@ class ResearchArchiveTests(unittest.TestCase):
 
     def test_original_binary_assets_have_expected_file_signatures(self):
         signatures = {
-            "src/db/Congress.db": b"SQLite format 3\\x00",
-            "src/db/temp/mass_shootings.db": b"SQLite format 3\\x00",
+            "src/db/Congress.db": b"SQLite format 3\x00",
+            "src/db/temp/mass_shootings.db": b"SQLite format 3\x00",
             "src/db/store/MSA/Stanford_MSA_Data_Dictionary (V.5).pdf": b"%PDF-",
-            "src/images/.png/Grades.png": b"\\x89PNG\\r\\n\\x1a\\n",
+            "src/images/.png/Grades.png": b"\x89PNG\r\n\x1a\n",
         }
         for relative_path, expected in signatures.items():
             with self.subTest(path=relative_path):
