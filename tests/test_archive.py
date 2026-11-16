@@ -1,6 +1,7 @@
 """Dependency-free checks for the static research archive front page."""
 
 from html.parser import HTMLParser
+import sqlite3
 from pathlib import Path
 import unittest
 from urllib.parse import unquote, urlparse
@@ -76,6 +77,19 @@ class ResearchArchiveTests(unittest.TestCase):
         for path in required:
             with self.subTest(path=path):
                 self.assertTrue((ROOT / path).is_file())
+
+    def test_archived_sqlite_databases_pass_read_only_integrity_check(self):
+        databases = (
+            "src/db/Congress.db",
+            "src/db/temp/mass_shootings.db",
+        )
+        for relative_path in databases:
+            with self.subTest(database=relative_path):
+                path = (ROOT / relative_path).resolve()
+                uri = f"file:{path.as_posix()}?mode=ro"
+                with sqlite3.connect(uri, uri=True) as database:
+                    result = database.execute("PRAGMA integrity_check").fetchone()
+                self.assertEqual(result, ("ok",))
 
     def test_original_binary_assets_have_expected_file_signatures(self):
         signatures = {
