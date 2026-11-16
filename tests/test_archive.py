@@ -68,6 +68,27 @@ class ResearchArchiveTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertTrue((ROOT / path).is_file())
 
+    def test_original_binary_assets_have_expected_file_signatures(self):
+        signatures = {
+            "src/db/Congress.db": b"SQLite format 3\\x00",
+            "src/db/temp/mass_shootings.db": b"SQLite format 3\\x00",
+            "src/db/store/MSA/Stanford_MSA_Data_Dictionary (V.5).pdf": b"%PDF-",
+            "src/images/.png/Grades.png": b"\\x89PNG\\r\\n\\x1a\\n",
+        }
+        for relative_path, expected in signatures.items():
+            with self.subTest(path=relative_path):
+                path = ROOT / relative_path
+                self.assertGreater(path.stat().st_size, len(expected))
+                with path.open("rb") as original:
+                    self.assertEqual(original.read(len(expected)), expected)
+
+    def test_sql_reference_retains_its_state_abbreviation_statements(self):
+        sql = (ROOT / "src/db/store/Abbreviations.sql").read_text(encoding="utf-8")
+        self.assertIn("SELECT REPLACE(state", sql)
+        self.assertIn('"KY", "Kentucky"', sql)
+        self.assertIn('"LA", "Louisiana"', sql)
+        self.assertIn('"VI", "Virgin Islands"', sql)
+
     def test_sidecar_excel_file_is_not_advertised_as_a_workbook(self):
         sidecar = ROOT / "src/db/store/__MACOSX/MSA/._Stanford_MSA_Database_for_release_06142016.xlsx"
         self.assertEqual(sidecar.stat().st_size, 181)
