@@ -67,13 +67,16 @@ class ResearchArchiveTests(unittest.TestCase):
         missing = sorted(set(self.parser.fragment_targets) - set(self.parser.ids))
         self.assertEqual(missing, [], f"Broken in-page links: {missing}")
 
-    def test_all_local_assets_resolve(self):
-        missing = []
+    def test_all_local_assets_resolve_without_escaping_archive_root(self):
+        failures = []
+        archive_root = ROOT.resolve()
         for path in self.parser.resources:
             target = (ROOT / path).resolve()
-            if not target.exists():
-                missing.append(path)
-        self.assertEqual(missing, [])
+            if not target.is_relative_to(archive_root):
+                failures.append(f"Path escapes archive root: {path}")
+            elif not target.exists():
+                failures.append(f"Missing local asset: {path}")
+        self.assertEqual(failures, [], "\\n".join(failures))
 
     def test_images_have_alt_text(self):
         self.assertEqual(self.parser.images_without_alt, [])
