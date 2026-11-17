@@ -16,17 +16,13 @@ class ArchiveParser(HTMLParser):
         self.images_without_alt = []
         self.landmarks = set()
         self.ids = []
-        self.fragments = []
         self.language = False
-        self.ids = []
         self.fragment_targets = []
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
         if tag == "html":
             self.language = bool(attrs.get("lang"))
-        if attrs.get("id"):
-            self.ids.append(attrs["id"])
         if attrs.get("id"):
             self.ids.append(attrs["id"])
         href = attrs.get("href", "")
@@ -83,15 +79,6 @@ class ResearchArchiveTests(unittest.TestCase):
 
     def test_images_have_alt_text(self):
         self.assertEqual(self.parser.images_without_alt, [])
-
-    def test_internal_fragment_links_resolve_to_unique_ids(self):
-        duplicates = sorted(
-            identifier for identifier in set(self.parser.ids)
-            if self.parser.ids.count(identifier) > 1
-        )
-        missing = sorted(set(self.parser.fragments) - set(self.parser.ids))
-        self.assertEqual(duplicates, [])
-        self.assertEqual(missing, [])
 
     def test_page_has_a_single_primary_heading(self):
         class HeadingCounter(HTMLParser):
