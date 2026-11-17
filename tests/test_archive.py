@@ -15,12 +15,19 @@ class ArchiveParser(HTMLParser):
         self.resources = []
         self.images_without_alt = []
         self.landmarks = set()
+        self.ids = []
         self.language = False
+        self.fragment_targets = []
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
         if tag == "html":
             self.language = bool(attrs.get("lang"))
+        if attrs.get("id"):
+            self.ids.append(attrs["id"])
+        href = attrs.get("href", "")
+        if href.startswith("#") and len(href) > 1:
+            self.fragment_targets.append(href[1:])
         if tag in {"header", "main", "footer", "nav"}:
             self.landmarks.add(tag)
         for name in ("href", "src"):
@@ -54,6 +61,12 @@ class ResearchArchiveTests(unittest.TestCase):
                 self.assertIn(landmark, self.parser.landmarks)
         self.assertIn('href="#main"', self.source)
 
+    def test_internal_fragment_links_resolve_to_unique_ids(self):
+        duplicates = sorted({value for value in self.parser.ids if self.parser.ids.count(value) > 1})
+        self.assertEqual(duplicates, [], f"Duplicate HTML ids: {duplicates}")
+        missing = sorted(set(self.parser.fragment_targets) - set(self.parser.ids))
+        self.assertEqual(missing, [], f"Broken in-page links: {missing}")
+
     def test_all_local_assets_resolve(self):
         missing = []
         for path in self.parser.resources:
@@ -64,6 +77,20 @@ class ResearchArchiveTests(unittest.TestCase):
 
     def test_images_have_alt_text(self):
         self.assertEqual(self.parser.images_without_alt, [])
+
+    def test_page_has_a_single_primary_heading(self):
+        class HeadingCounter(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.count = 0
+
+            def handle_starttag(self, tag, attrs):
+                if tag == "h1":
+                    self.count += 1
+
+        headings = HeadingCounter()
+        headings.feed(self.source)
+        self.assertEqual(headings.count, 1)
 
     def test_original_data_and_document_assets_are_preserved(self):
         required = (
