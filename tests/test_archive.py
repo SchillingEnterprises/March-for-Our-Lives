@@ -33,8 +33,6 @@ class ArchiveParser(HTMLParser):
         for name in ("href", "src"):
             value = attrs.get(name, "")
             parsed = urlparse(value)
-            if name == "href" and value.startswith("#"):
-                self.fragments.append(value[1:])
             if value and not parsed.scheme and not value.startswith(("#", "mailto:", "data:")):
                 self.resources.append(unquote(parsed.path))
         if tag == "img" and not attrs.get("alt", "").strip():
