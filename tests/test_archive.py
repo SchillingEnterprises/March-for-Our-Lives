@@ -15,6 +15,8 @@ class ArchiveParser(HTMLParser):
         self.resources = []
         self.images_without_alt = []
         self.landmarks = set()
+        self.ids = []
+        self.fragments = []
         self.language = False
         self.ids = []
         self.fragment_targets = []
@@ -25,6 +27,8 @@ class ArchiveParser(HTMLParser):
             self.language = bool(attrs.get("lang"))
         if attrs.get("id"):
             self.ids.append(attrs["id"])
+        if attrs.get("id"):
+            self.ids.append(attrs["id"])
         href = attrs.get("href", "")
         if href.startswith("#") and len(href) > 1:
             self.fragment_targets.append(href[1:])
@@ -33,6 +37,8 @@ class ArchiveParser(HTMLParser):
         for name in ("href", "src"):
             value = attrs.get(name, "")
             parsed = urlparse(value)
+            if name == "href" and value.startswith("#"):
+                self.fragments.append(value[1:])
             if value and not parsed.scheme and not value.startswith(("#", "mailto:", "data:")):
                 self.resources.append(unquote(parsed.path))
         if tag == "img" and not attrs.get("alt", "").strip():
@@ -77,6 +83,29 @@ class ResearchArchiveTests(unittest.TestCase):
 
     def test_images_have_alt_text(self):
         self.assertEqual(self.parser.images_without_alt, [])
+
+    def test_internal_fragment_links_resolve_to_unique_ids(self):
+        duplicates = sorted(
+            identifier for identifier in set(self.parser.ids)
+            if self.parser.ids.count(identifier) > 1
+        )
+        missing = sorted(set(self.parser.fragments) - set(self.parser.ids))
+        self.assertEqual(duplicates, [])
+        self.assertEqual(missing, [])
+
+    def test_page_has_a_single_primary_heading(self):
+        class HeadingCounter(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.count = 0
+
+            def handle_starttag(self, tag, attrs):
+                if tag == "h1":
+                    self.count += 1
+
+        headings = HeadingCounter()
+        headings.feed(self.source)
+        self.assertEqual(headings.count, 1)
 
     def test_original_data_and_document_assets_are_preserved(self):
         required = (
