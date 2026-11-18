@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#202b2a">
+  <meta name="description" content="A preserved research archive with original data files, documentation, and supporting materials.">
+  <title>March for Our Lives | Research Archive</title>
+  <style>
+    :root{--ink:#202b2a;--muted:#65716b;--paper:#f4f4ed;--white:#fffef9;--green:#31564c;--lime:#d8e4bd;--line:rgba(32,43,42,.15);--serif:Georgia,"Times New Roman",serif;--sans:Arial,Helvetica,sans-serif}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:84px}
+    body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.7 var(--sans);-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    a:hover{color:var(--green)}
+    :focus-visible{outline:3px solid #9a6a32;outline-offset:3px}
+    .skip{position:absolute;top:1rem;left:1rem;z-index:10;padding:.7rem 1rem;background:#fff;transform:translateY(-150%)}
+    .skip:focus{transform:translateY(0)}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.2rem clamp(1.2rem,6vw,6rem);border-bottom:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:.7rem;font-weight:700;letter-spacing:-.03em}
+    .brand-mark{display:grid;place-items:center;width:35px;height:35px;border:1px solid var(--green);border-radius:50%;color:var(--green);font:italic 1.2rem var(--serif)}
+    .nav{display:flex;gap:1.4rem;color:var(--muted);font-size:.7rem;font-weight:700}
+    .hero{position:relative;overflow:hidden;padding:clamp(5rem,10vw,9rem) clamp(1.2rem,10vw,10rem);background:var(--ink);color:#fff}
+    .hero:after{position:absolute;right:-8rem;top:-16rem;width:clamp(22rem,55vw,52rem);height:clamp(22rem,55vw,52rem);border:1px solid rgba(216,228,189,.25);border-radius:50%;content:""}
+    .hero:before{position:absolute;right:2rem;top:-8rem;width:clamp(16rem,39vw,38rem);height:clamp(16rem,39vw,38rem);border:1px solid rgba(216,228,189,.18);border-radius:50%;content:""}
+    .hero-copy{position:relative;z-index:1;max-width:760px}
+    .eyebrow{margin:0 0 1.1rem;color:var(--lime);font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+    h1,h2,h3,p{margin-top:0}
+    h1{margin-bottom:1.4rem;font:500 clamp(3.2rem,8vw,7.4rem)/.99 var(--serif);letter-spacing:-.065em}
+    h1 em,h2 em{color:var(--lime);font-weight:500}
+    .hero-copy>p:last-child{max-width:580px;margin-bottom:0;color:rgba(255,255,255,.72);font-size:.91rem;line-height:1.95}
+    .hero-meta{position:absolute;right:clamp(1rem,5vw,5rem);bottom:2.5rem;color:rgba(255,255,255,.55);font-size:.58rem;letter-spacing:.18em;writing-mode:vertical-rl}
+    main{max-width:1400px;margin:auto;padding:clamp(3.5rem,7vw,6rem) clamp(1.2rem,6vw,5rem)}
+    .intro{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:end;margin-bottom:2.8rem}
+    .section-kicker{margin-bottom:.8rem;color:var(--green);font-size:.61rem;font-weight:700;letter-spacing:.17em;text-transform:uppercase}
+    h2{margin-bottom:0;font:500 clamp(2.2rem,4.6vw,4.2rem)/1.06 var(--serif);letter-spacing:-.05em}
+    .intro-copy{max-width:480px;color:var(--muted);font-size:.78rem;line-height:1.9}
+    .asset-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+    .asset-card{display:flex;min-height:245px;flex-direction:column;justify-content:space-between;padding:1.5rem;background:var(--white);border:1px solid var(--line);transition:transform .2s ease,box-shadow .2s ease}
+    .asset-card:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(32,43,42,.08)}
+    .asset-number{color:var(--green);font-size:.59rem;font-weight:700;letter-spacing:.16em}
+    .asset-type{margin-bottom:.55rem;color:var(--muted);font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+    .asset-card h3{margin-bottom:.55rem;font:500 clamp(1.4rem,2.5vw,2rem)/1.15 var(--serif)}
+    .asset-card p{max-width:490px;margin-bottom:1.2rem;color:var(--muted);font-size:.72rem;line-height:1.8}
+    .asset-link{display:inline-flex;align-items:center;gap:.65rem;color:var(--green);font-size:.67rem;font-weight:700}
+    .asset-link span{transition:transform .2s ease}
+    .asset-link:hover span{transform:translate(3px,-3px)}
+    .support{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3rem;padding:1.5rem;background:var(--lime)}
+    .support h3{margin-bottom:.5rem;font:500 1.5rem var(--serif)}
+    .support p{margin:0;color:#4b5b4e;font-size:.72rem;line-height:1.85}
+    .archive-note{margin-top:1.2rem;padding:1.3rem 1.5rem;border-left:3px solid var(--green);background:rgba(255,255,255,.58);color:var(--muted);font-size:.69rem;line-height:1.85}
+    .preview{margin-top:2rem}
+    .preview img{display:block;width:min(100%,600px);height:auto;border:1px solid var(--line);background:#fff}
+    .preview figcaption{max-width:600px;margin-top:.5rem;color:var(--muted);font-size:.64rem}
+    footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;padding:2rem clamp(1.2rem,6vw,6rem);background:var(--ink);color:#fff}
+    footer p{margin:0;color:rgba(255,255,255,.6);font-size:.65rem}
+    footer small{flex-basis:100%;padding-top:1rem;border-top:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.45);font-size:.58rem}
+    @media(max-width:760px){.intro,.support{grid-template-columns:1fr;gap:1.2rem}.asset-grid{grid-template-columns:1fr}.hero-meta{display:none}}
+    @media(max-width:500px){.nav{gap:.7rem;font-size:.6rem}.topbar{padding:.9rem 1rem}.brand{font-size:.82rem}.hero{padding:5rem 1.2rem}.asset-card{min-height:210px;padding:1.2rem}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="topbar">
+    <a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">M</span>March for Our Lives</a>
+    <nav class="nav" aria-label="Main navigation"><a href="#research">Research assets</a><a href="#context">About the archive</a></nav>
+  </header>
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">RESEARCH · DATA · DOCUMENTATION</p>
+      <h1>Evidence deserves<br><em>careful context.</em></h1>
+      <p>A preserved research archive of source files, database materials, and supporting documentation. Explore the original assets with attention to provenance, definitions, and the limits of the available records.</p>
+    </div>
+    <span class="hero-meta" aria-hidden="true">RESEARCH ARCHIVE / 01</span>
+  </section>
+
+  <main id="main">
+    <section id="research">
+      <div class="intro">
+        <div><p class="section-kicker">THE SOURCE COLLECTION</p><h2>Research <em>assets.</em></h2></div>
+        <p class="intro-copy">The original files are preserved in their existing formats. Database downloads are provided as source material—not as a verified, harmonized, or continuously updated dataset. Review the source, schema, collection period, and methodology before drawing conclusions.</p>
+      </div>
+
+      <div class="asset-grid">
+        <article class="asset-card">
+          <span class="asset-number">01 / SQLITE DATABASE</span>
+          <div><p class="asset-type">Congressional reference data</p><h3>Congress database</h3><p>An original SQLite database preserved from the project. The repository does not currently document its complete schema or provenance.</p><a class="asset-link" href="./src/db/Congress.db" download>Download Congress.db <span aria-hidden="true">↓</span></a></div>
+        </article>
+        <article class="asset-card">
+          <span class="asset-number">02 / SQLITE DATABASE</span>
+          <div><p class="asset-type">Research data</p><h3>Mass shootings database</h3><p>An original SQLite database retained in the project’s temporary-data folder. Check its schema, source definitions, and collection dates before analysis or redistribution.</p><a class="asset-link" href="./src/db/temp/mass_shootings.db" download>Download mass_shootings.db <span aria-hidden="true">↓</span></a></div>
+        </article>
+        <article class="asset-card">
+          <span class="asset-number">03 / DOCUMENTATION</span>
+          <div><p class="asset-type">Data dictionary</p><h3>Stanford MSA data dictionary</h3><p>Preserved PDF documentation associated with the historical research material. Consult the dictionary alongside the database rather than guessing column meanings.</p><a class="asset-link" href="./src/db/store/MSA/Stanford_MSA_Data_Dictionary%20%28V.5%29.pdf" target="_blank" rel="noopener noreferrer">Open data dictionary <span aria-hidden="true">↗</span></a></div>
+        </article>
+        <article class="asset-card">
+          <span class="asset-number">04 / SQL REFERENCE</span>
+          <div><p class="asset-type">State and territory abbreviations</p><h3>Abbreviations SQL</h3><p>Original SQL statements that map state and territory abbreviations to longer labels. Review and adapt the statements to your own schema before running them.</p><a class="asset-link" href="./src/db/store/Abbreviations.sql" target="_blank" rel="noopener noreferrer">View SQL reference <span aria-hidden="true">↗</span></a></div>
+        </article>
+      </div>
+
+      <div class="support">
+        <div><p class="section-kicker">SUPPORTING MATERIAL</p><h3>Additional project image</h3><p>A preserved visual asset from the original repository is retained below. It is not presented as a verified chart or statistical finding.</p></div>
+        <figure class="preview"><img src="./src/images/.png/Grades.png" alt="Original Grades image file preserved from the research project" loading="lazy" decoding="async"><figcaption>Original repository asset: Grades.png</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="context" class="archive-note">
+      <strong>About this archive.</strong> This repository is a preserved project snapshot, not a live data service. The database contents, table definitions, data provenance, licensing, update cadence, and analytical methodology have not been independently validated as part of this presentation. The Excel filename currently visible in the repository is only a small macOS metadata sidecar, not a usable workbook, so no spreadsheet download is offered. Do not treat the database labels or this page as an endorsement of a particular interpretation. Verify sources and definitions before citation, publication, policy analysis, or redistribution.
+    </section>
+  </main>
+
+  <footer>
+    <a class="brand" href="./index.html"><span class="brand-mark" aria-hidden="true">M</span>March for Our Lives</a>
+    <p>A preserved research and data archive.</p>
+    <small>Research files are supplied in their original repository form. Check the repository license and each source’s own terms before reuse.</small>
+  </footer>
+</body>
+</html>
