@@ -184,4 +184,4 @@ class PagesArtifactTests(unittest.TestCase):
         for excluded in ("test ! -e dist/.github", "test ! -e dist/tests", "test ! -e dist/README.md"):
             with self.subTest(path=excluded):
                 self.assertIn(excluded, workflow)
-        self.assertNotIn("with:\\n          path: .", workflow)
+        self.assertNotIn("path: .", workflow)
