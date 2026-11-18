@@ -181,6 +181,8 @@ class PagesArtifactTests(unittest.TestCase):
     def test_pages_artifact_excludes_repository_development_material(self):
         workflow = (ROOT / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
         self.assertIn("path: dist", workflow)
+        self.assertIn("name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}", workflow)
+        self.assertIn("artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}", workflow)
         for excluded in ("test ! -e dist/.github", "test ! -e dist/tests", "test ! -e dist/README.md"):
             with self.subTest(path=excluded):
                 self.assertIn(excluded, workflow)
