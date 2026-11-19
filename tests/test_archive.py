@@ -172,10 +172,6 @@ class ResearchArchiveTests(unittest.TestCase):
         self.assertNotIn("jupyter", self.source.lower())
 
 
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
-
-
 class PagesArtifactTests(unittest.TestCase):
     """Guard the public Pages artifact against repository-wide publishing."""
 
@@ -200,3 +196,6 @@ class PagesArtifactTests(unittest.TestCase):
             with self.subTest(path=excluded):
                 self.assertIn(excluded, workflow)
         self.assertNotIn("path: .", workflow)
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
