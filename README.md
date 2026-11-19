@@ -41,3 +41,7 @@ The landing page intentionally does not publish derived statistics or analysis. 
 ## Preservation
 
 The modernization changes the repository's homepage and documentation only. Original databases, PDF, SQL reference, image, and license remain preserved.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for this repository's security, privacy, and responsible-use guidance.
