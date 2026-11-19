@@ -54,6 +54,19 @@ class ResearchArchiveTests(unittest.TestCase):
         self.assertIn("./index.html#research", page)
         self.assertIn("Original data and source materials remain unchanged", page)
 
+    def test_404_page_local_references_resolve_without_escaping_archive_root(self):
+        page = ArchiveParser()
+        page.feed((ROOT / "404.html").read_text(encoding="utf-8"))
+        failures = []
+        archive_root = ROOT.resolve()
+        for reference in page.resources:
+            target = (ROOT / reference).resolve()
+            if not target.is_relative_to(archive_root):
+                failures.append(f"404 path escapes archive root: {reference}")
+            elif not target.exists():
+                failures.append(f"Missing local 404-page reference: {reference}")
+        self.assertEqual(failures, [], "\\n".join(failures))
+
     def test_homepage_is_accessible_and_semantic(self):
         self.assertTrue(self.parser.language)
         for landmark in ("header", "main", "footer", "nav"):
