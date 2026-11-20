@@ -2,7 +2,7 @@
 
 ## Scope
 
-This repository preserves a static research archive and original SQLite databases, a PDF data dictionary, SQL reference material, and image assets. The landing page does not publish derived statistics or independently validate the research datasets.
+This repository preserves research files and provides a static SQLite explorer. The browser application reads selected database files in a local Web Worker and does not upload database contents to a backend.
 
 ## Data handling
 
@@ -10,6 +10,8 @@ This repository preserves a static research archive and original SQLite database
 - Do not add personal, confidential, or restricted records, credentials, or private exports.
 - Before redistribution or analysis, review the original source terms, data dictionary, schema, transformations, and applicable privacy requirements.
 - Do not upload database contents or extracts to public issues, pull requests, CI logs, or artifacts.
+- The explorer downloads its pinned, open-source `sql.js` JavaScript and WebAssembly runtime from jsDelivr. The selected database is processed in the browser worker; its contents are not sent to that CDN or stored by the page.
+- CSV files are generated in the browser and downloaded to the user's device. Closing the database releases the worker's in-memory copy.
 - Preserve original files and history; do not replace or migrate databases without a documented backup and review plan.
 
 ## Reporting

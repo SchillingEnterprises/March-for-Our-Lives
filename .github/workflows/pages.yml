@@ -21,7 +21,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Run archive tests
-        run: python -m unittest discover -s tests -v
+        run: |
+          python -m unittest discover -s tests -v
+          node --check app.js
+          node --check db-worker.js
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -44,7 +47,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist/src/db/temp dist/src/db/store/MSA dist/src/images/.png
-          cp index.html 404.html robots.txt LICENSE dist/
+          cp index.html 404.html robots.txt LICENSE app.js db-worker.js styles.css dist/
           cp src/db/Congress.db dist/src/db/
           cp src/db/temp/mass_shootings.db dist/src/db/temp/
           cp "src/db/store/MSA/Stanford_MSA_Data_Dictionary (V.5).pdf" dist/src/db/store/MSA/
@@ -52,6 +55,9 @@ jobs:
           cp src/images/.png/Grades.png dist/src/images/.png/
           test -f dist/index.html
           test -f dist/404.html
+          test -f dist/app.js
+          test -f dist/db-worker.js
+          test -f dist/styles.css
           test -f dist/src/db/Congress.db
           test -f dist/src/db/temp/mass_shootings.db
           test -f "dist/src/db/store/MSA/Stanford_MSA_Data_Dictionary (V.5).pdf"
