@@ -162,14 +162,105 @@ class ResearchArchiveTests(unittest.TestCase):
         self.assertIn("metadata sidecar", self.source)
 
     def test_research_limitations_are_explicit(self):
-        for phrase in ("not a live data service", "not been independently validated", "provenance"):
+        for phrase in ("not a live incident census", "not been independently validated", "provenance"):
             with self.subTest(phrase=phrase):
                 self.assertIn(phrase, self.source)
+
+    def test_history_and_current_prevention_story_leads_the_archive(self):
+        self.assertIn("Understand the past.", self.source)
+        self.assertIn('id="history"', self.source)
+        self.assertIn('id="why"', self.source)
+        self.assertIn('id="policy"', self.source)
+        self.assertIn('id="prevention"', self.source)
+        self.assertIn('id="sources"', self.source)
+        self.assertLess(self.source.index('id="prevention"'), self.source.index('id="explorer"'))
+        self.assertIn("No credible “best party” ranking", self.source)
+        self.assertIn("Secure Communities", self.source)
+        self.assertIn("through December 31, 2024", self.source)
+        for source in (
+            "https://pmc.ncbi.nlm.nih.gov/articles/PMC13487550/",
+            "https://pmc.ncbi.nlm.nih.gov/articles/PMC13263779/",
+            "https://www.nber.org/papers/w32109",
+            "https://www.ice.gov/statistics",
+            "https://doi.org/10.1017/S1537592719003943",
+        ):
+            with self.subTest(source=source):
+                self.assertIn(source, self.source)
+        self.assertIn("more than <strong>44,000</strong>", self.source)
+        self.assertIn("Current-source check: November 20, 2026", self.source)
+        for source in (
+            "https://www.cdc.gov/firearm-violence/data-research/facts-stats/index.html",
+            "https://wisqars.cdc.gov/",
+            "https://www.cdc.gov/nchs/nvss/vsrr/viser.html",
+            "https://www.cdc.gov/nvdrs/about/index.html",
+            "https://nces.ed.gov/programs/coe/indicator/a01",
+            "https://doi.org/10.7326/M13-1301",
+        ):
+            with self.subTest(source=source):
+                self.assertIn(source, self.source)
 
     def test_old_notebook_runtime_is_not_loaded(self):
         self.assertNotIn("require.min.js", self.source)
         self.assertNotIn("CodeMirror", self.source)
         self.assertNotIn("jupyter", self.source.lower())
+
+    def test_explorer_exposes_local_database_controls_and_privacy_limits(self):
+        self.assertIn('type="file"', self.source)
+        self.assertIn('id="record-search"', self.source)
+        self.assertIn('id="export-csv"', self.source)
+        self.assertIn('id="profile-variable"', self.source)
+        self.assertIn('id="profile-chart"', self.source)
+        self.assertIn('id="story-title"', self.source)
+        self.assertIn("not a random sample", self.source)
+        self.assertIn("database contents are not sent there", self.source)
+        app = (ROOT / "app.js").read_text(encoding="utf-8")
+        for behavior in (
+            "file.arrayBuffer()",
+            "MAX_EXPORT_ROWS",
+            "updateProfile()",
+            "new Worker(\"./db-worker.js\")",
+        ):
+            with self.subTest(behavior=behavior):
+                self.assertIn(behavior, app)
+        self.assertNotIn("fetch(", app.replace("fetch(SAMPLE_DATABASE_URL)", ""))
+        worker = (ROOT / "db-worker.js").read_text(encoding="utf-8")
+        for behavior in (
+            "new SQL.Database(new Uint8Array(buffer))",
+            "database.close()",
+            "PRAGMA quick_check",
+            "COUNT(DISTINCT CASE",
+            "PROFILE_SAMPLE_SIZE",
+            "sampleStandardDeviation",
+            'kind: "date"',
+            "getStory",
+            "timeSummary",
+            "topStates",
+            "textContent = quoteForDisplay(value)",
+            "instr(lower(CAST(",
+        ):
+            with self.subTest(behavior=behavior):
+                self.assertIn(behavior, worker + app)
+
+    def test_research_audit_checks_are_rendered_with_caveats(self):
+        self.assertIn('id="quality-checks"', self.source)
+        self.assertIn("not proof that the source is wrong", self.source)
+        app = (ROOT / "app.js").read_text(encoding="utf-8")
+        self.assertIn("renderQualityChecks(story.qualityChecks)", app)
+        self.assertIn("detail.textContent = check.detail", app)
+        worker = (ROOT / "db-worker.js").read_text(encoding="utf-8")
+        for check in (
+            "Date consistency",
+            "Detailed dates",
+            "Count-field reconciliation",
+            "Coordinate bounds",
+            "Category coding",
+            "Numeric values stored as text",
+            "Count fields stored as text",
+            "Undocumented classification",
+            "Motive interpretation",
+        ):
+            with self.subTest(check=check):
+                self.assertIn(check, worker)
 
 
 class PagesArtifactTests(unittest.TestCase):
@@ -179,7 +270,7 @@ class PagesArtifactTests(unittest.TestCase):
         workflow = (ROOT / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
         self.assertIn("mkdir -p dist/src/db/temp dist/src/db/store/MSA dist/src/images/.png", workflow)
         for public_path in (
-            "index.html", "404.html", "robots.txt", "LICENSE",
+            "index.html", "404.html", "robots.txt", "LICENSE", "app.js", "db-worker.js", "styles.css",
             "src/db/Congress.db", "src/db/temp/mass_shootings.db",
             "src/db/store/MSA/Stanford_MSA_Data_Dictionary (V.5).pdf",
             "src/db/store/Abbreviations.sql", "src/images/.png/Grades.png",
