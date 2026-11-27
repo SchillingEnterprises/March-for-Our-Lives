@@ -199,13 +199,23 @@ class ResearchArchiveTests(unittest.TestCase):
             with self.subTest(source=source):
                 self.assertIn(source, self.source)
 
-    def test_browser_sqlite_runtime_is_pinned_to_verified_release(self):
+    def test_browser_sqlite_runtime_is_pinned_and_served_from_same_origin(self):
         worker = (ROOT / "db-worker.js").read_text(encoding="utf-8")
-        self.assertIn(
-            'const SQL_JS_BASE = "https://cdn.jsdelivr.net/npm/sql.js@1.17.0/dist/";',
-            worker,
-        )
-        self.assertIn("locateFile: (file) => `${SQL_JS_BASE}${file}`", worker)
+        vendor_script = (ROOT / "scripts/vendor-sqljs.sh").read_text(encoding="utf-8")
+        workflow = (ROOT / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
+
+        self.assertIn('const SQL_JS_RUNTIME = "./vendor/sql.js/sql-wasm-inline.js";', worker)
+        self.assertIn("importScripts(SQL_JS_RUNTIME)", worker)
+        self.assertIn("SQL = await self.initSqlJs()", worker)
+        self.assertNotIn("cdn.jsdelivr.net", worker)
+        self.assertIn('SQL_JS_VERSION="1.17.0"', vendor_script)
+        self.assertIn("npm pack --silent --ignore-scripts", vendor_script)
+        self.assertIn("dist/sql-wasm-inline.js", vendor_script)
+        self.assertEqual(workflow.count("bash scripts/vendor-sqljs.sh"), 2)
+        self.assertIn("vendor/sql.js/sql-wasm-inline.js", workflow)
+        self.assertIn("vendor/sql.js/LICENSE", workflow)
+        self.assertTrue((ROOT / "vendor/sql.js/sql-wasm-inline.js").is_file())
+        self.assertTrue((ROOT / "vendor/sql.js/LICENSE").is_file())
 
     def test_old_notebook_runtime_is_not_loaded(self):
         self.assertNotIn("require.min.js", self.source)
@@ -220,7 +230,7 @@ class ResearchArchiveTests(unittest.TestCase):
         self.assertIn('id="profile-chart"', self.source)
         self.assertIn('id="story-title"', self.source)
         self.assertIn("not a random sample", self.source)
-        self.assertIn("database contents are not sent there", self.source)
+        self.assertIn("database files and query data are never sent to a third-party runtime service", self.source)
         app = (ROOT / "app.js").read_text(encoding="utf-8")
         for behavior in (
             "file.arrayBuffer()",
@@ -276,12 +286,15 @@ class PagesArtifactTests(unittest.TestCase):
 
     def test_pages_workflow_stages_only_explicit_public_archive_assets(self):
         workflow = (ROOT / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
-        self.assertIn("mkdir -p dist/src/db/temp dist/src/db/store/MSA dist/src/images/.png", workflow)
+        self.assertIn("mkdir -p dist/src/db/temp dist/src/db/store/MSA dist/src/images/.png dist/vendor/sql.js", workflow)
+        self.assertEqual(workflow.count("bash scripts/vendor-sqljs.sh"), 2)
+        self.assertIn("cp vendor/sql.js/sql-wasm-inline.js vendor/sql.js/LICENSE dist/vendor/sql.js/", workflow)
         for public_path in (
             "index.html", "404.html", "robots.txt", "LICENSE", "app.js", "db-worker.js", "styles.css",
             "src/db/Congress.db", "src/db/temp/mass_shootings.db",
             "src/db/store/MSA/Stanford_MSA_Data_Dictionary (V.5).pdf",
             "src/db/store/Abbreviations.sql", "src/images/.png/Grades.png",
+            "vendor/sql.js/sql-wasm-inline.js", "vendor/sql.js/LICENSE",
         ):
             with self.subTest(path=public_path):
                 self.assertIn(public_path, workflow)
