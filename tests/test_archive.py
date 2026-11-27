@@ -199,6 +199,14 @@ class ResearchArchiveTests(unittest.TestCase):
             with self.subTest(source=source):
                 self.assertIn(source, self.source)
 
+    def test_browser_sqlite_runtime_is_pinned_to_verified_release(self):
+        worker = (ROOT / "db-worker.js").read_text(encoding="utf-8")
+        self.assertIn(
+            'const SQL_JS_BASE = "https://cdn.jsdelivr.net/npm/sql.js@1.17.0/dist/";',
+            worker,
+        )
+        self.assertIn("locateFile: (file) => `${SQL_JS_BASE}${file}`", worker)
+
     def test_old_notebook_runtime_is_not_loaded(self):
         self.assertNotIn("require.min.js", self.source)
         self.assertNotIn("CodeMirror", self.source)
