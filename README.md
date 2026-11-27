@@ -12,7 +12,7 @@ python -m http.server 8000
 
 Open `http://localhost:8000`. The sample database is loaded only when selected. A local `.db`, `.sqlite`, or `.sqlite3` file can also be opened from the browser. The explorer supports files up to 100 MB.
 
-The application has no backend, account, analytics, tracking, paid API, or AI service. Current research and data are linked directly to their publishers and are not silently merged into the preserved archive. SQLite runs in a browser worker using the pinned, open-source `sql.js` WebAssembly package from jsDelivr, keeping database work off the page's main thread. Database contents stay in the current tab's memory and are not uploaded or saved by the page. A network connection is required to load the SQL engine; after closing the tab, in-memory database contents are released. The original databases remain available to download directly.
+The application has no backend, account, analytics, tracking, paid API, or AI service. Current research and data are linked directly to their publishers and are not silently merged into the preserved archive. SQLite runs in a browser worker using the pinned, open-source `sql.js` 1.17.0 WebAssembly package from jsDelivr, keeping database work off the page's main thread. Database contents stay in the current tab's memory and are not uploaded or saved by the page. A network connection is required to load the SQL engine; after closing the tab, in-memory database contents are released. The original databases remain available to download directly.
 
 ## Preserved assets
 
