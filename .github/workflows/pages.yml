@@ -22,6 +22,12 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Vendor the pinned same-origin SQLite runtime
+        run: bash scripts/vendor-sqljs.sh
       - name: Run archive tests
         run: |
           python -m unittest discover -s tests -v
@@ -44,14 +50,21 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Vendor the pinned same-origin SQLite runtime
+        run: bash scripts/vendor-sqljs.sh
       - name: Configure GitHub Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
       - name: Stage the approved public archive only
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p dist/src/db/temp dist/src/db/store/MSA dist/src/images/.png
+          mkdir -p dist/src/db/temp dist/src/db/store/MSA dist/src/images/.png dist/vendor/sql.js
           cp index.html 404.html robots.txt LICENSE app.js db-worker.js styles.css dist/
+          cp vendor/sql.js/sql-wasm-inline.js vendor/sql.js/LICENSE dist/vendor/sql.js/
           cp src/db/Congress.db dist/src/db/
           cp src/db/temp/mass_shootings.db dist/src/db/temp/
           cp "src/db/store/MSA/Stanford_MSA_Data_Dictionary (V.5).pdf" dist/src/db/store/MSA/
@@ -62,6 +75,8 @@ jobs:
           test -f dist/app.js
           test -f dist/db-worker.js
           test -f dist/styles.css
+          test -s dist/vendor/sql.js/sql-wasm-inline.js
+          test -s dist/vendor/sql.js/LICENSE
           test -f dist/src/db/Congress.db
           test -f dist/src/db/temp/mass_shootings.db
           test -f "dist/src/db/store/MSA/Stanford_MSA_Data_Dictionary (V.5).pdf"

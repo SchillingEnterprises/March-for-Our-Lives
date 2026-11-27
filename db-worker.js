@@ -1,6 +1,6 @@
 "use strict";
 
-const SQL_JS_BASE = "https://cdn.jsdelivr.net/npm/sql.js@1.17.0/dist/";
+const SQL_JS_RUNTIME = "./vendor/sql.js/sql-wasm-inline.js";
 const PROFILE_SAMPLE_SIZE = 10000;
 let SQL = null;
 let database = null;
@@ -39,9 +39,9 @@ function getOrderedQuery(table, columns, query, sortColumn, sortDirection) {
 async function loadDatabase(buffer) {
   if (!SQL) {
     if (typeof self.initSqlJs !== "function") {
-      importScripts(`${SQL_JS_BASE}sql-wasm.js`);
+      importScripts(SQL_JS_RUNTIME);
     }
-    SQL = await self.initSqlJs({ locateFile: (file) => `${SQL_JS_BASE}${file}` });
+    SQL = await self.initSqlJs();
   }
   const candidate = new SQL.Database(new Uint8Array(buffer));
   let tables;

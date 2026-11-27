@@ -266,3 +266,6 @@ pyvenv.cfg
 .venv
 pip-selfcheck.json
 
+
+# Generated same-origin sql.js runtime (built for local tests/Pages only)
+vendor/sql.js/

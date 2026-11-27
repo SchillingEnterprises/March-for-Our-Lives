@@ -4,15 +4,16 @@ A static, evidence-led guide to the history of firearm harm and prevention. It c
 
 ## Run locally
 
-From the repository root, start a static server:
+From the repository root, vendor the pinned SQLite runtime, then start a static server:
 
 ```bash
+bash scripts/vendor-sqljs.sh
 python -m http.server 8000
 ```
 
 Open `http://localhost:8000`. The sample database is loaded only when selected. A local `.db`, `.sqlite`, or `.sqlite3` file can also be opened from the browser. The explorer supports files up to 100 MB.
 
-The application has no backend, account, analytics, tracking, paid API, or AI service. Current research and data are linked directly to their publishers and are not silently merged into the preserved archive. SQLite runs in a browser worker using the pinned, open-source `sql.js` 1.17.0 WebAssembly package from jsDelivr, keeping database work off the page's main thread. Database contents stay in the current tab's memory and are not uploaded or saved by the page. A network connection is required to load the SQL engine; after closing the tab, in-memory database contents are released. The original databases remain available to download directly.
+The application has no backend, account, analytics, tracking, paid API, or AI service. Current research and data are linked directly to their publishers and are not silently merged into the preserved archive. SQLite runs in a browser worker using the pinned, open-source `sql.js` 1.17.0 inline WebAssembly build, served from this site's own origin. The local setup script downloads the exact npm package release and extracts the runtime and MIT license; the browser does not load the SQL engine from a third-party CDN or fetch a companion WebAssembly file. Database files and query data remain in the current tab's worker memory and are never sent to a third-party runtime service, uploaded to an application backend, or saved by the page. The original databases remain available to download directly.
 
 ## Preserved assets
 
@@ -29,9 +30,11 @@ The Excel filename under `src/db/store/__MACOSX` is a 181-byte macOS metadata si
 Run the dependency-free archive tests and JavaScript syntax check:
 
 ```bash
+bash scripts/vendor-sqljs.sh
 python -m unittest discover -s tests -v
 node --check app.js
 node --check db-worker.js
+bash -n scripts/vendor-sqljs.sh
 ```
 
 GitHub Actions validates the archive and deploys only the explicitly approved public files to GitHub Pages after changes merge to `master`.
