@@ -1,6 +1,6 @@
 "use strict";
 
-const SQL_JS_BASE = "https://cdn.jsdelivr.net/npm/sql.js@1.13.0/dist/";
+const SQL_JS_BASE = "https://cdn.jsdelivr.net/npm/sql.js@1.17.0/dist/";
 const PROFILE_SAMPLE_SIZE = 10000;
 let SQL = null;
 let database = null;
