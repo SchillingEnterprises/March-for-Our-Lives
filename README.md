@@ -30,9 +30,11 @@ The Excel filename under `src/db/store/__MACOSX` is a 181-byte macOS metadata si
 Run the dependency-free archive tests and JavaScript syntax check:
 
 ```bash
+bash scripts/vendor-sqljs.sh
 python -m unittest discover -s tests -v
 node --check app.js
 node --check db-worker.js
+bash -n scripts/vendor-sqljs.sh
 ```
 
 GitHub Actions validates the archive and deploys only the explicitly approved public files to GitHub Pages after changes merge to `master`.
